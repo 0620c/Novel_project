@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Image Upload Test</title>
+</head>
+<body>
+  <h2>이미지 업로드 테스트</h2>
+
+  <input type="file" id="fileInput" accept="image/*" />
+  <br /><br />
+
+  <button onclick="uploadImage()">업로드</button>
+
+  <pre id="result"></pre>
+
+  <script>
+    async function uploadImage() {
+      const fileInput = document.getElementById("fileInput");
+      const result = document.getElementById("result");
+
+      if (!fileInput.files.length) {
+        alert("이미지를 선택하세요");
+        return;
+      }
+
+      const file = fileInput.files[0];
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const response = await fetch("http://127.0.0.1:8000/upload-image", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await response.json();
+        result.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        result.textContent = "에러 발생: " + err;
+      }
+    }
+  </script>
+</body>
+</html>
