@@ -3,6 +3,8 @@ from app.schemas import GenerateRequest, JobResponse
 import uuid
 import os
 import shutil
+import queue
+
 
 router = APIRouter()
 
@@ -21,3 +23,12 @@ def upload_image(file :UploadFile = File(...)):
     with open(file_path, "wb") as f:
         shutil.copyfileobj(file.file, f)
     return {"message": "Image uploaded successfully", "filename": filename}
+
+@router.post("/generate")
+def generate_api(image_path: str, prompt: str):
+    job = queue.enqueue(
+        "worker.tasks.generate",
+        image_path,
+        prompt
+    )
+    return {"job_id": job.id}
